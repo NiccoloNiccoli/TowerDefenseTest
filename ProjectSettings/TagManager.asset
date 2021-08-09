@@ -8,6 +8,12 @@ TagManager:
   - Enemy
   - Hero
   - Grid
+  - Spawner
+  - CharacterUnlocker
+  - ARC
+  - Misc
+  - LevelButton
+  - LevelUnlocker
   layers:
   - Default
   - TransparentFX

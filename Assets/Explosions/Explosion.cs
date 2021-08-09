@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class Explosion : MonoBehaviour
 {
-    private Animator anim;
-    private float countdown;
-    private AudioSource audioSource;
+    protected Animator anim;
+    protected float countdown;
+    protected AudioSource audioSource;
     // Start is called before the first frame update
-    void Start()
+
+    protected virtual void Start()
     {
         audioSource = GetComponent<AudioSource>();
         audioSource.volume = 0.7f;
@@ -18,7 +19,7 @@ public class Explosion : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         if (countdown<=0.0f) {
             Destroy(this.gameObject);

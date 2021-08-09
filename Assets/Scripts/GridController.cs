@@ -21,6 +21,9 @@ public class GridController : MonoBehaviour
     [SerializeField] private Transform left_top, right_bottom;
     private Vector3 LT, RB;
     private Vector3Int previousMousePos;
+
+    public Tilemap InteractiveMap { get => interactiveMap; set => interactiveMap = value; }
+
     void Start()
     {
         correctiveOffset = new Vector2(1, 0.5f);
@@ -55,14 +58,16 @@ public class GridController : MonoBehaviour
                 Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 Vector2 pos2 = new Vector2(Mathf.Floor(pos.x), Mathf.Floor(pos.y));
                 pos2 += correctiveOffset;
-                if (!occupiedPositions.Contains(pos2) && selectedHero!=null) {
+                int cost = selectedHero.GetComponent<Hero>().GetCost();
+                GameObject game = GameObject.FindGameObjectWithTag("GameController");
+                if (!occupiedPositions.Contains(pos2) && selectedHero!=null && cost <= game.GetComponent<GameData>().Money) {
                     GameObject currentObj = Instantiate(selectedHero, pos2, Quaternion.identity);
                     occupiedPositions.Add(pos2);
                     currentObj.GetComponent<Hero>().SetPos(pos2);
 
                     //pays the hero
-                    GameObject game = GameObject.FindGameObjectWithTag("GameController");
-                    int cost = selectedHero.GetComponent<Hero>().GetCost();
+                   
+                   
                     game.GetComponent<GameData>().Earn(-cost);
 
                     //discovers in which row it has instantiated the object and set its sorting layer properly
@@ -73,8 +78,6 @@ public class GridController : MonoBehaviour
                     currentObj.GetComponent<SpriteRenderer>().sortingOrder = 1 + i;
                     selectedHero = null;
 
-                    
-                    //TODO: change visibility layer according to nearby turrets
                 }
             }
 
@@ -121,4 +124,12 @@ public class GridController : MonoBehaviour
         }
         return true;
     }
+
+    public void reset()
+    {
+        occupiedPositions.Clear();
+        selectedHero = null;
+    }
 }
+
+

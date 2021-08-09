@@ -5,28 +5,29 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] private int health = 3;
-    [SerializeField] private int attack;
-    [SerializeField] private int range;
-    [SerializeField] private float cooldown;
-    [SerializeField] private int reward;
+    [SerializeField] protected int health = 3;
+    [SerializeField] protected int attack;
+    [SerializeField] protected int range;
+    [SerializeField] protected float cooldown;
+    [SerializeField] protected int reward;
     [SerializeField] protected AudioClip attackSound;
     [SerializeField] protected AudioClip hitSound;
     [SerializeField] protected AudioClip deathSound;
+    [SerializeField] protected Vector2 initialOffset;
     protected AudioSource audioSource;
-    private float timeToNextAttack = 0f;
-    private bool isSlowed = false;
-    Animator anim;
+    protected float timeToNextAttack = 0f;
+    protected bool isSlowed = false;
+    protected Animator anim;
 
     [SerializeField]
-    float moveSpeed = 1f;
+    protected float moveSpeed = 1f;
 
-    private Vector2 trgPoint;
+    protected Vector2 trgPoint;
 
-    void Start() {
+    protected virtual void Start() {
         audioSource = GetComponent<AudioSource>();
         audioSource.volume = 0.7f;
-        transform.position = new Vector2(transform.position.x, transform.position.y + 0.49f);
+        transform.position = new Vector2(transform.position.x + initialOffset.x, transform.position.y + 0.49f + initialOffset.y);
         anim = GetComponent<Animator>();
         GameObject target = GameObject.FindGameObjectWithTag("Target");
         trgPoint = new Vector2(target.transform.position.x, transform.position.y);
@@ -34,7 +35,7 @@ public class Enemy : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update() {
+    virtual protected void Update() {
         GameObject[] heroes = GameObject.FindGameObjectsWithTag("Hero");
         if (heroes.Length >= 0) {
             float minDistance = Mathf.Infinity;
@@ -58,19 +59,18 @@ public class Enemy : MonoBehaviour
         timeToNextAttack -= Time.deltaTime;
 
         if (transform.position.x.Equals(trgPoint.x)) {
-            Debug.LogError("Hai perso!");
-            Time.timeScale = 0.0f;
-            //TODO
+            GameObject.FindGameObjectWithTag("GameController").GetComponent<GameData>().Lose();
         }
         
     }
 
-    private void Move() {
+    protected void Move() {
             transform.position = Vector2.MoveTowards(transform.position, trgPoint, moveSpeed * Time.deltaTime);
     }
 
-    public void GetHit(int dmg) {
+    virtual public void GetHit(int dmg) {
         health -= dmg;
+        anim.SetTrigger("getHit");
         audioSource.PlayOneShot(hitSound, 1.0f);
         if (health <= 0)
             Die();
@@ -78,6 +78,7 @@ public class Enemy : MonoBehaviour
 
     public void Die() {
         StartCoroutine(PlayDeathAnim(anim.GetCurrentAnimatorStateInfo(0).length));
+        StartCoroutine(DestroyAfter(5.0f));
     }
 
     public bool IsAlive() {
@@ -87,7 +88,7 @@ public class Enemy : MonoBehaviour
             return false;
     }
 
-    public void Attack() {
+    virtual public void Attack() {
         if (!anim.GetCurrentAnimatorStateInfo(0).IsTag("attack")) {
             anim.SetTrigger("attack"); //0 -> idle, 1->run, 2->attack
             audioSource.PlayOneShot(attackSound, 1.0f);
@@ -136,5 +137,11 @@ public class Enemy : MonoBehaviour
         isSlowed = false;
     }
 
+    IEnumerator DestroyAfter(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        Destroy(gameObject);
+
+    }
 
 }

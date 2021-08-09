@@ -15,6 +15,9 @@ public class Buttons : MonoBehaviour
 
     private int cost;
     private bool mustInit = true;
+
+    public bool MustInit { get => mustInit; set => mustInit = value; }
+
     // Start is called before the first frame update
     void Start()
     {

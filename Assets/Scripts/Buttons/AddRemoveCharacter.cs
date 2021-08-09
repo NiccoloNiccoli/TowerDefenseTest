@@ -11,12 +11,23 @@ public class AddRemoveCharacter : MonoBehaviour
     [SerializeField] private bool isRoster = true;
     private Animator anim;
     private bool needAnUpdate = false;
-    private void Start() {
+
+    public bool IsRoster { get => isRoster; set => isRoster = value; }
+
+    private void OnEnable() {
         anim = GetComponent<Animator>();
+        var colors = GetComponent<Button>().colors;
+        colors.disabledColor = Color.black;
+        GetComponent<Button>().colors = colors;
         if (isRoster) {
             GetComponent<Image>().sprite = charSel.GetComponent<CharacterSelection>().GetCharacter(index).GetComponent<Hero>().iconSprite;
             anim.SetInteger("index", index);
+            if (!GameObject.FindGameObjectWithTag("CharacterUnlocker").GetComponent<CharacterUnlocker>().Unlocked[index])
+            {
+                GetComponent<Button>().interactable = false;
+            }
         }
+        
     }
 
     private void Update() {
@@ -24,7 +35,6 @@ public class AddRemoveCharacter : MonoBehaviour
             anim.SetInteger("index", index);
             needAnUpdate = false;
         }
-            
     }
     public void Add() {
         charSel.GetComponent<CharacterSelection>().AddCharacter(index);
@@ -42,4 +52,6 @@ public class AddRemoveCharacter : MonoBehaviour
             index = i;
         }   
     }
+
+
 }

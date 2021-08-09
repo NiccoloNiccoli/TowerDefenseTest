@@ -13,6 +13,8 @@ public class CharacterSelection : MonoBehaviour
     [SerializeField] private List<GameObject> selectedCharacters = null;
     private int teamMembers = 0;
 
+    public int TeamMembers { get => teamMembers; set => teamMembers = value; }
+
     void Start()
     {
         
@@ -29,6 +31,8 @@ public class CharacterSelection : MonoBehaviour
         for(int i=0; i<selectedCharacters.Count; i++) {
             game.GetComponent<GameData>().AddCharacter(selectedCharacters[i]);
         }
+            selectedCharacters.Clear();
+
         
     }
 
@@ -57,8 +61,6 @@ public class CharacterSelection : MonoBehaviour
             for(int i=pos; i<teamMembers-1; i++) {
                 team[i].sprite = null;
                 team[i].GetComponent<AddRemoveCharacter>().ResetIndex(team[i + 1].GetComponent<AddRemoveCharacter>().index);
-                
-               
             }
             selectedCharacters.RemoveAt(pos);
             team[teamMembers - 1].sprite = null;
